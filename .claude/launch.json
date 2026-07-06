@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "logbook",
+      "runtimeExecutable": "C:\\Ruby33-x64\\bin\\ruby.exe",
+      "runtimeArgs": ["-run", "-e", "httpd", ".", "-p", "8123"],
+      "port": 8123
+    }
+  ]
+}

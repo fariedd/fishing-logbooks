@@ -1,0 +1,175 @@
+/* ============ Paper form look — mirrors the printed logbook ============ */
+
+.paper {
+  background: #fff;
+  width: min(860px, 100%);
+  margin: 0 auto 26px;
+  padding: 34px 38px 42px;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0,0,0,.14), 0 12px 34px rgba(20,40,60,.12);
+  font-family: "Arial", "Helvetica Neue", sans-serif;
+  font-size: 13px;
+  color: #111;
+}
+/* Freezer cover is printed on blue paper */
+.paper.blue { background: #cfeefc; }
+
+.paper input, .paper select, .paper textarea {
+  font-family: inherit; font-size: 13px; color: #06255c;
+  background: transparent; border: 0; outline: none; width: 100%;
+  padding: 3px 4px; min-height: 26px;
+}
+.paper input:focus, .paper textarea:focus { background: #fff8d6; box-shadow: inset 0 -2px 0 #0b5fa5; }
+.paper.blue input:focus, .paper.blue textarea:focus { background: #fffbe8; }
+.paper input[type="number"] { -moz-appearance: textfield; text-align: right; }
+.paper input::-webkit-outer-spin-button, .paper input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+/* ---------- generic bordered tables ---------- */
+.ptable { border-collapse: collapse; width: 100%; }
+.ptable th, .ptable td { border: 1px solid #111; padding: 2px 5px; vertical-align: middle; }
+.ptable .lbl { background: #b9c4cc55; font-weight: 700; }
+.paper.blue .ptable .lbl { background: #9fd8ef; }
+.ptable .shade { background: #c9ced3; }
+.ptable td.cell-in { padding: 0; }
+.ptable .num { text-align: right; }
+
+/* ---------- cover page ---------- */
+.cov-head { display: flex; justify-content: space-between; gap: 16px; margin-bottom: 14px; }
+.cov-dept { font-size: 11.5px; line-height: 1.45; }
+.cov-dept .logo { font-size: 20px; font-weight: 800; letter-spacing: -.5px; }
+.cov-dept .logo small { display: block; font-size: 11px; font-weight: 600; letter-spacing: 0; }
+.cov-form-no { text-align: right; font-size: 12px; font-weight: 700; }
+.cov-title { text-align: center; margin: 18px 0 4px; font-size: 24px; font-weight: 800; letter-spacing: .5px; }
+.cov-sub { text-align: center; font-size: 19px; font-weight: 800; margin-bottom: 20px; }
+.cov-grid { display: grid; grid-template-columns: 1fr; gap: 14px; }
+.official {
+  border: 2.5px solid #111; padding: 12px 14px; margin-top: 22px;
+}
+.official h4 { margin: 0 0 10px; text-align: center; font-size: 14px; letter-spacing: 1px; }
+.official .row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; flex-wrap: wrap; }
+.official .row b { min-width: 150px; font-size: 12px; }
+.official .line { flex: 1; border-bottom: 1px solid #111; min-width: 120px; min-height: 20px; }
+.official .opt { border: 1px solid #111; padding: 2px 10px; font-size: 12px; }
+.official-note { font-size: 11px; color: #333; margin-top: 6px; font-style: italic; }
+.tick-group { display: inline-flex; }
+.tick {
+  border: 1px solid #111; padding: 3px 12px; font-size: 12px; cursor: pointer; user-select: none;
+  background: #fff;
+}
+.tick + .tick { border-left: 0; }
+.tick.on { background: #06255c; color: #fff; font-weight: 700; }
+.paper.blue .tick { background: #e9f7fd; }
+.paper.blue .tick.on { background: #06255c; color: #fff; }
+
+.units-note { font-weight: 700; margin: 16px 0 6px; }
+
+/* ---------- T&C pages ---------- */
+.tc h3 { text-align: center; text-decoration: underline; font-size: 14.5px; margin: 4px 0 16px; }
+.tc h4 { font-size: 13.5px; margin: 18px 0 8px; text-align: center; letter-spacing: .4px; }
+.tc h5 { font-size: 13px; margin: 14px 0 4px; }
+.tc ol { margin: 6px 0; padding-left: 24px; }
+.tc li { margin-bottom: 7px; line-height: 1.5; }
+.tc ul { margin: 6px 0; padding-left: 22px; }
+.tc p { line-height: 1.55; }
+.tc .note { font-weight: 700; margin-top: 16px; line-height: 1.5; }
+
+/* ---------- header info sheet ---------- */
+.sheet-title { text-align: center; font-size: 17px; font-weight: 800; margin: 2px 0 14px; }
+.hdr-wrap { overflow-x: auto; }
+.hdr-table { border-collapse: collapse; min-width: 780px; width: 100%; }
+.hdr-table th, .hdr-table td { border: 1px solid #111; padding: 1px 4px; font-size: 12px; }
+.hdr-table thead th { font-weight: 700; text-align: center; }
+.hdr-table .rowlbl { font-weight: 700; white-space: nowrap; padding: 2px 6px; background: #fff; }
+.hdr-table .grouplbl {
+  font-weight: 700; text-align: center; background: #fff;
+  writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; width: 26px; padding: 4px 2px;
+}
+.hdr-table .sublbl { font-weight: 400; white-space: nowrap; padding: 2px 6px; border-bottom-style: dashed; }
+.hdr-table td.pcell { padding: 0; min-width: 86px; }
+.hdr-table td.pcell input { min-height: 30px; text-align: center; font-size: 12.5px; }
+.hdr-table tr.emph .rowlbl { text-align: center; }
+.hdr-note { font-size: 12px; margin: 10px 2px; line-height: 1.5; }
+
+.codes-wrap { display: flex; justify-content: center; margin-top: 14px; }
+.codes { border-collapse: collapse; font-size: 11px; }
+.codes th, .codes td { border: 1px solid #111; padding: 2px 6px; }
+.codes th { text-align: center; }
+.codes td.cnum { text-align: center; width: 22px; }
+
+.remarks { margin-top: 20px; }
+.remarks label { font-weight: 700; letter-spacing: .5px; }
+.remarks textarea {
+  width: 100%; min-height: 64px; resize: vertical;
+  background-image: repeating-linear-gradient(transparent, transparent 25px, #999 25px, #999 26px);
+  line-height: 26px; padding: 0 4px;
+}
+.declaration { margin-top: 16px; font-size: 12.5px; line-height: 1.5; }
+.declaration b { text-decoration: underline; }
+.sig-row { display: flex; align-items: flex-end; gap: 14px; margin-top: 14px; flex-wrap: wrap; }
+.sig-row .who { font-weight: 600; min-width: 70px; }
+.sig-row .name-line { flex: 1; min-width: 200px; }
+.sig-row .name-line input { border-bottom: 1px solid #111; }
+.sigpad { border-bottom: 1px solid #111; position: relative; }
+.sigpad canvas { display: block; touch-action: none; background: transparent; }
+.sigpad .clear-sig {
+  position: absolute; top: -8px; right: -8px; border: 0; background: #eef1f4; color: #5a6b7b;
+  border-radius: 50%; width: 26px; height: 26px; font-size: 13px; cursor: pointer; line-height: 1;
+}
+
+/* ---------- catch sheet ---------- */
+.catch-date-row {
+  display: flex; align-items: center; gap: 10px; justify-content: flex-end; margin-bottom: 8px;
+  font-size: 12.5px; font-weight: 700;
+}
+.catch-date-row input { width: 160px; border-bottom: 1px solid #111; min-height: 28px; }
+.catch-cols { display: grid; grid-template-columns: 1fr; gap: 0; }
+@media (min-width: 900px) { .catch-cols { grid-template-columns: 1fr 1fr; gap: 0 14px; align-items: start; } }
+.catch-t { border-collapse: collapse; width: 100%; font-size: 11.8px; }
+.catch-t th, .catch-t td { border: 1px solid #111; padding: 1px 4px; }
+.catch-t thead th { font-weight: 700; text-align: left; font-size: 12px; }
+.catch-t .sp { font-weight: 700; white-space: nowrap; }
+.catch-t .bandlbl {
+  writing-mode: vertical-rl; transform: rotate(180deg);
+  text-align: center; font-weight: 600; font-size: 10.5px;
+  width: 20px; padding: 4px 1px; white-space: nowrap;
+}
+.catch-t .dt { white-space: nowrap; }
+.catch-t .cd { white-space: nowrap; }
+.catch-t td.mass { padding: 0; width: 74px; }
+.catch-t td.mass input { text-align: right; min-height: 24px; font-size: 12.5px; }
+.catch-t tr.total td { font-weight: 700; background: #eff2f4; }
+.catch-t tr.total td.mass { background: #eff2f4; }
+.catch-t tr.total td.mass .tval { text-align: right; padding: 3px 5px; min-height: 24px; font-weight: 700; }
+.catch-t tr.grand td { background: #dfe6ea; }
+.catch-t tr.subhead td {
+  background: #c9ced3; font-weight: 700; text-align: center; letter-spacing: .4px;
+}
+.catch-t tr.shaded td { background: #dfe3e7; }
+.catch-others-head td { font-weight: 700; text-align: center; background: #eff2f4; }
+.fuel-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; font-weight: 700; font-size: 12.5px; }
+.fuel-row input { border-bottom: 1px solid #111; width: 180px; }
+.catch-note { font-size: 11px; line-height: 1.45; margin-top: 8px; }
+
+/* ---------- delete page link ---------- */
+.page-actions { width: min(860px, 100%); margin: -12px auto 30px; text-align: right; }
+.page-actions button { background: none; border: 0; color: var(--danger); font-size: 13px; cursor: pointer; padding: 8px; }
+
+/* ============ PRINT — each .paper becomes an A4 page ============ */
+@media print {
+  body { background: #fff; }
+  .topbar, .pagestrip, .fab, .exportbar, .page-actions, .toast, .modal-back { display: none !important; }
+  .sheet-scroller { overflow: visible; padding: 0; }
+  #app { display: block; }
+  .print-root .paper {
+    box-shadow: none; border-radius: 0; width: 100%; margin: 0;
+    page-break-after: always; padding: 10mm 8mm;
+  }
+  .paper.blue { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .ptable .lbl, .catch-t tr.total td, .catch-t tr.subhead td, .catch-t tr.shaded td,
+  .hdr-table .grouplbl, .tick.on {
+    -webkit-print-color-adjust: exact; print-color-adjust: exact;
+  }
+  .hdr-wrap { overflow: visible; }
+  .sigpad .clear-sig { display: none; }
+  .paper input:focus, .paper textarea:focus { background: transparent; box-shadow: none; }
+}

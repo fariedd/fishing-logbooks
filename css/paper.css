@@ -74,38 +74,42 @@
 .tc .note { font-weight: 700; margin-top: 16px; line-height: 1.5; }
 
 /* ---------- header info sheet ---------- */
-.sheet-title { text-align: center; font-size: 17px; font-weight: 800; margin: 2px 0 14px; }
+/* Dense, single-page layout mirroring the printed form. */
+.paper.hdr, .paper.catch { padding: 18px 20px 22px; }
+.sheet-title { text-align: center; font-size: 16px; font-weight: 800; margin: 0 0 8px; }
 .hdr-wrap { overflow-x: auto; }
-.hdr-table { border-collapse: collapse; min-width: 780px; width: 100%; }
-.hdr-table th, .hdr-table td { border: 1px solid #111; padding: 1px 4px; font-size: 12px; }
-.hdr-table thead th { font-weight: 700; text-align: center; }
-.hdr-table .rowlbl { font-weight: 700; white-space: nowrap; padding: 2px 6px; background: #fff; }
+.hdr-table { border-collapse: collapse; min-width: 620px; width: 100%; table-layout: fixed; }
+.hdr-table th, .hdr-table td { border: 1px solid #111; padding: 0 3px; font-size: 11px; line-height: 1.1; }
+.hdr-table thead th { font-weight: 700; text-align: center; width: auto; }
+.hdr-table col.c-group { width: 18px; }
+.hdr-table col.c-label { width: 118px; }
+.hdr-table .rowlbl { font-weight: 700; white-space: nowrap; padding: 0 5px; background: #fff; }
 .hdr-table .grouplbl {
   font-weight: 700; text-align: center; background: #fff;
-  writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; width: 26px; padding: 4px 2px;
+  writing-mode: vertical-rl; transform: rotate(180deg); white-space: nowrap; width: 18px; padding: 2px 1px;
 }
-.hdr-table .sublbl { font-weight: 400; white-space: nowrap; padding: 2px 6px; border-bottom-style: dashed; }
-.hdr-table td.pcell { padding: 0; min-width: 86px; }
-.hdr-table td.pcell input { min-height: 30px; text-align: center; font-size: 12.5px; }
+.hdr-table .sublbl { font-weight: 400; white-space: nowrap; padding: 0 5px; border-bottom-style: dashed; }
+.hdr-table td.pcell { padding: 0; }
+.hdr-table td.pcell input { min-height: 21px; text-align: center; font-size: 11px; padding: 0 2px; }
 .hdr-table tr.emph .rowlbl { text-align: center; }
-.hdr-note { font-size: 12px; margin: 10px 2px; line-height: 1.5; }
+.hdr-note { font-size: 10.5px; margin: 6px 2px; line-height: 1.4; }
 
-.codes-wrap { display: flex; justify-content: center; margin-top: 14px; }
-.codes { border-collapse: collapse; font-size: 11px; }
-.codes th, .codes td { border: 1px solid #111; padding: 2px 6px; }
+.codes-wrap { display: flex; justify-content: center; margin-top: 8px; }
+.codes { border-collapse: collapse; font-size: 10px; }
+.codes th, .codes td { border: 1px solid #111; padding: 0 5px; line-height: 1.35; }
 .codes th { text-align: center; }
-.codes td.cnum { text-align: center; width: 22px; }
+.codes td.cnum { text-align: center; width: 20px; }
 
-.remarks { margin-top: 20px; }
+.remarks { margin-top: 10px; }
 .remarks label { font-weight: 700; letter-spacing: .5px; }
 .remarks textarea {
-  width: 100%; min-height: 64px; resize: vertical;
-  background-image: repeating-linear-gradient(transparent, transparent 25px, #999 25px, #999 26px);
-  line-height: 26px; padding: 0 4px;
+  width: 100%; min-height: 42px; resize: vertical;
+  background-image: repeating-linear-gradient(transparent, transparent 20px, #999 20px, #999 21px);
+  line-height: 21px; padding: 0 4px;
 }
-.declaration { margin-top: 16px; font-size: 12.5px; line-height: 1.5; }
+.declaration { margin-top: 8px; font-size: 11px; line-height: 1.4; }
 .declaration b { text-decoration: underline; }
-.sig-row { display: flex; align-items: flex-end; gap: 14px; margin-top: 14px; flex-wrap: wrap; }
+.sig-row { display: flex; align-items: flex-end; gap: 14px; margin-top: 8px; flex-wrap: wrap; }
 .sig-row .who { font-weight: 600; min-width: 70px; }
 .sig-row .name-line { flex: 1; min-width: 200px; }
 .sig-row .name-line input { border-bottom: 1px solid #111; }
@@ -117,59 +121,98 @@
 }
 
 /* ---------- catch sheet ---------- */
+/* Two tightly-packed columns side by side, always — mirrors the printed form. */
 .catch-date-row {
-  display: flex; align-items: center; gap: 10px; justify-content: flex-end; margin-bottom: 8px;
-  font-size: 12.5px; font-weight: 700;
+  display: flex; align-items: center; gap: 10px; justify-content: flex-end; margin-bottom: 5px;
+  font-size: 12px; font-weight: 700;
 }
-.catch-date-row input { width: 160px; border-bottom: 1px solid #111; min-height: 28px; }
-.catch-cols { display: grid; grid-template-columns: 1fr; gap: 0; }
-@media (min-width: 900px) { .catch-cols { grid-template-columns: 1fr 1fr; gap: 0 14px; align-items: start; } }
-.catch-t { border-collapse: collapse; width: 100%; font-size: 11.8px; }
-.catch-t th, .catch-t td { border: 1px solid #111; padding: 1px 4px; }
-.catch-t thead th { font-weight: 700; text-align: left; font-size: 12px; }
-.catch-t .sp { font-weight: 700; white-space: nowrap; }
+.catch-date-row input { width: 150px; border-bottom: 1px solid #111; min-height: 22px; }
+.catch-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 0 10px; align-items: start; }
+.catch-t { border-collapse: collapse; width: 100%; font-size: 10.5px; }
+.catch-t th, .catch-t td { border: 1px solid #111; padding: 0 3px; line-height: 1.15; }
+.catch-t thead th { font-weight: 700; text-align: left; font-size: 10.5px; }
+.catch-t .sp { font-weight: 700; }
 .catch-t .bandlbl {
   writing-mode: vertical-rl; transform: rotate(180deg);
-  text-align: center; font-weight: 600; font-size: 10.5px;
-  width: 20px; padding: 4px 1px; white-space: nowrap;
+  text-align: center; font-weight: 600; font-size: 9px;
+  width: 15px; padding: 2px 0; white-space: nowrap;
 }
-.catch-t .dt { white-space: nowrap; }
-.catch-t .cd { white-space: nowrap; }
-.catch-t td.mass { padding: 0; width: 74px; }
-.catch-t td.mass input { text-align: right; min-height: 24px; font-size: 12.5px; }
+.catch-t .dt { }
+.catch-t .cd { }
+.catch-t td.mass { padding: 0; width: 56px; }
+.catch-t td.mass input { text-align: right; min-height: 18px; font-size: 11px; padding: 0 2px; }
 .catch-t tr.total td { font-weight: 700; background: #eff2f4; }
 .catch-t tr.total td.mass { background: #eff2f4; }
-.catch-t tr.total td.mass .tval { text-align: right; padding: 3px 5px; min-height: 24px; font-weight: 700; }
+.catch-t tr.total td.mass .tval { text-align: right; padding: 0 4px; min-height: 18px; font-weight: 700; }
 .catch-t tr.grand td { background: #dfe6ea; }
 .catch-t tr.subhead td {
   background: #c9ced3; font-weight: 700; text-align: center; letter-spacing: .4px;
 }
 .catch-t tr.shaded td { background: #dfe3e7; }
 .catch-others-head td { font-weight: 700; text-align: center; background: #eff2f4; }
-.fuel-row { display: flex; align-items: center; gap: 10px; margin-top: 10px; font-weight: 700; font-size: 12.5px; }
-.fuel-row input { border-bottom: 1px solid #111; width: 180px; }
-.catch-note { font-size: 11px; line-height: 1.45; margin-top: 8px; }
+.fuel-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; font-weight: 700; font-size: 11px; }
+.fuel-row input { border-bottom: 1px solid #111; width: 150px; }
+.catch-note { font-size: 9.5px; line-height: 1.35; margin-top: 5px; }
 
 /* ---------- delete page link ---------- */
 .page-actions { width: min(860px, 100%); margin: -12px auto 30px; text-align: right; }
 .page-actions button { background: none; border: 0; color: var(--danger); font-size: 13px; cursor: pointer; padding: 8px; }
 
-/* ============ PRINT — each .paper becomes an A4 page ============ */
+/* ============ PRINT — each section fits on ONE A4 page ============ */
 @media print {
+  @page { size: A4 portrait; margin: 7mm; }
   body { background: #fff; }
-  .topbar, .pagestrip, .fab, .exportbar, .page-actions, .toast, .modal-back { display: none !important; }
+  .topbar, .pagestrip, .fab, .exportbar, .page-actions, .toast, .modal-back, .ov-label { display: none !important; }
   .sheet-scroller { overflow: visible; padding: 0; }
   #app { display: block; }
+
   .print-root .paper {
     box-shadow: none; border-radius: 0; width: 100%; margin: 0;
-    page-break-after: always; padding: 10mm 8mm;
+    padding: 4mm 5mm;
+    page-break-after: always;
+    break-inside: avoid; page-break-inside: avoid; /* keep a sheet on one page */
   }
+  .print-root .paper:last-child { page-break-after: auto; }
+
+  /* Header & Catch are dense — shrink type/padding so each lands on one page */
+  .paper.hdr, .paper.catch { font-size: 9px; }
+  .sheet-title { font-size: 13px; margin: 0 0 6px; }
+
+  .hdr-wrap { overflow: visible; }
+  .hdr-table { min-width: 0; width: 100%; table-layout: fixed; }
+  .hdr-table th, .hdr-table td { padding: 0 2px; font-size: 8.5px; }
+  .hdr-table td.pcell { min-width: 0; }
+  .hdr-table td.pcell input { min-height: 15px; font-size: 8.5px; padding: 0 1px; }
+  .hdr-table .sublbl, .hdr-table .rowlbl { padding: 0 3px; }
+  .codes { font-size: 7.5px; }
+  .codes th, .codes td { padding: 0 3px; }
+  .hdr-note { font-size: 8px; margin: 4px 2px; }
+  .remarks textarea { min-height: 34px; background-image: none; }
+  .declaration { font-size: 8.5px; margin-top: 6px; }
+  .sig-row { margin-top: 6px; }
+
+  /* Force the catch sheet into its two-column layout regardless of page width */
+  .catch-cols { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 0 6px !important; align-items: start; }
+  .catch-t { font-size: 8px; }
+  .catch-t th, .catch-t td { padding: 0 2px; line-height: 1.12; }
+  .catch-t td.mass input, .catch-t tr.total td.mass .tval { min-height: 12px; font-size: 8px; }
+  .catch-note { font-size: 7.5px; margin-top: 4px; }
+  .fuel-row { margin-top: 5px; font-size: 8.5px; }
+
+  /* Cover: tighten so identity + official-use block fit one page */
+  .paper.cover { font-size: 10px; }
+  .cov-title { font-size: 19px; margin: 8px 0 2px; }
+  .cov-sub { font-size: 15px; margin-bottom: 10px; }
+  .ptable th, .ptable td { padding: 1px 4px; }
+  .paper.cover input { min-height: 18px; }
+  .official { padding: 8px 10px; margin-top: 12px; }
+  .official .row { margin-bottom: 5px; }
+
   .paper.blue { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   .ptable .lbl, .catch-t tr.total td, .catch-t tr.subhead td, .catch-t tr.shaded td,
-  .hdr-table .grouplbl, .tick.on {
+  .hdr-table .grouplbl, .catch-t .bandlbl, .tick.on {
     -webkit-print-color-adjust: exact; print-color-adjust: exact;
   }
-  .hdr-wrap { overflow: visible; }
   .sigpad .clear-sig { display: none; }
   .paper input:focus, .paper textarea:focus { background: transparent; box-shadow: none; }
 }

@@ -173,11 +173,16 @@ function renderHeaderPage(trip, page, onChange) {
   const table = document.createElement("table");
   table.className = "hdr-table";
 
+  // Fixed column widths: thin group column, label column, then 7 equal period columns
+  let cols = `<colgroup><col class="c-group"><col class="c-label">`;
+  for (let p = 1; p <= MAX_PERIODS; p++) cols += `<col class="c-period">`;
+  cols += `</colgroup>`;
+
   // Head row: Activity Period | 1..7
   let thead = `<thead><tr><th class="rowlbl" colspan="2" style="text-align:left">Activity Period</th>`;
   for (let p = 1; p <= MAX_PERIODS; p++) thead += `<th>${p}</th>`;
   thead += `</tr></thead>`;
-  table.innerHTML = thead;
+  table.innerHTML = cols + thead;
 
   const tbody = document.createElement("tbody");
 

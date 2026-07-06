@@ -51,6 +51,67 @@ function tripName(trip) {
   return parts.join("_");
 }
 
+/* ---------- shared UI: bin button + confirm modal + typewriter ---------- */
+
+function binButton() {
+  const bin = Storage.listBin();
+  const btn = el(`
+    <button class="binbtn" id="binBtn" title="Bin">
+      <span class="bin-ic">🗑️</span>
+      ${bin.length ? `<span class="bin-badge">${bin.length}</span>` : ""}
+    </button>
+  `);
+  btn.addEventListener("click", showBin);
+  return btn;
+}
+
+function shakeBin() {
+  const b = document.getElementById("binBtn");
+  if (!b) return;
+  b.classList.remove("shake");
+  void b.offsetWidth; // restart the animation
+  b.classList.add("shake");
+  setTimeout(() => b.classList.remove("shake"), 700);
+}
+
+/* Promise-based confirmation dialog. */
+function confirmModal({ title, message, confirmLabel = "Confirm", danger = false }) {
+  return new Promise(resolve => {
+    const back = el(`
+      <div class="modal-back">
+        <div class="modal confirm">
+          <h3>${esc(title)}</h3>
+          <p class="m-sub">${esc(message)}</p>
+          <div class="confirm-actions">
+            <button class="btn ghost" data-no>Cancel</button>
+            <button class="btn ${danger ? "danger" : "primary"}" data-yes>${esc(confirmLabel)}</button>
+          </div>
+        </div>
+      </div>
+    `);
+    const done = v => { back.remove(); resolve(v); };
+    back.addEventListener("click", e => { if (e.target === back) done(false); });
+    back.querySelector("[data-no]").addEventListener("click", () => done(false));
+    back.querySelector("[data-yes]").addEventListener("click", () => done(true));
+    document.body.appendChild(back);
+  });
+}
+
+let heroTyped = false; // typewriter runs once per app load
+function typeWriter(node, text) {
+  node.textContent = "";
+  node.classList.add("typing");
+  let i = 0;
+  (function step() {
+    if (i <= text.length) {
+      node.textContent = text.slice(0, i++);
+      setTimeout(step, 45);
+    } else {
+      node.classList.remove("typing");
+    }
+  })();
+}
+
 /* ---------- HOME ---------- */
 
 function showHome() {
@@ -64,8 +125,11 @@ function showHome() {
       <div class="spacer"></div>
     </header>
     <main class="home">
-      <h1 class="hello">Hello 👋</h1>
-      <p class="hello-sub">What are we working on today?</p>
+      <div class="hello-wrap">
+        <img class="hello-logo" src="assets/imvelo-icon.png" alt="Imvelo Blue Environment">
+        <h1 class="hello">Hello Observer...</h1>
+      </div>
+      <p class="hello-sub" id="helloSub">What are we working on today</p>
       <div class="tiles">
         <button class="tile freezer" id="tileFreezer">
           <span class="stripe"></span>
@@ -83,6 +147,13 @@ function showHome() {
     </main>
   `;
 
+  // bin button lives top-right, always visible
+  document.querySelector(".topbar").insertBefore(binButton(), null);
+
+  // typewriter subheading — once per app load
+  const sub = document.getElementById("helloSub");
+  if (!heroTyped) { heroTyped = true; typeWriter(sub, "What are we working on today"); }
+
   document.getElementById("tileFreezer").addEventListener("click", () => {
     const trip = Storage.createTrip("freezer");
     openTrip(trip.id);
@@ -96,19 +167,107 @@ function showHome() {
       const name = tripName(t);
       const nPages = t.pages.length;
       const row = el(`
-        <button class="trip-row">
+        <div class="trip-row">
           <span class="dot"></span>
-          <span>
+          <span class="t-main">
             <div class="t-name">${esc(name)}</div>
             <div class="t-sub">Freezer log · ${nPages} sheet${nPages === 1 ? "" : "s"} · updated ${fmtDate(t.updatedAt)}</div>
           </span>
           <span class="spacer"></span>
           <span class="pill ${t.status === "submitted" ? "done" : ""}">${t.status === "submitted" ? "Submitted" : "In progress"}</span>
-        </button>
+          <button class="trip-del" title="Delete trip">🗑️</button>
+        </div>
       `);
-      row.addEventListener("click", () => openTrip(t.id));
+      row.querySelector(".t-main").addEventListener("click", () => openTrip(t.id));
+      row.querySelector(".dot").addEventListener("click", () => openTrip(t.id));
+      row.querySelector(".trip-del").addEventListener("click", async e => {
+        e.stopPropagation();
+        const ok = await confirmModal({
+          title: "Delete this trip?",
+          message: "Are you sure? This cannot be undone.",
+          confirmLabel: "Delete",
+          danger: true,
+        });
+        if (!ok) return;
+        Storage.binTrip(t.id);
+        showHome(); // re-render first so the bin button (with new count) exists…
+        toast("Done. It will be stored in the bin for 7 days.");
+        shakeBin(); // …then shake it for feedback
+      });
       list.appendChild(row);
     }
+  }
+}
+
+/* ---------- BIN ---------- */
+
+function timeLeft(purgeAt) {
+  const ms = purgeAt - Date.now();
+  if (ms <= 0) return "expiring";
+  const dayMs = 24 * 3600 * 1000;
+  if (ms >= dayMs) {
+    const days = Math.round(ms / dayMs); // fresh deletion reads "7 days left"
+    return `${days} day${days === 1 ? "" : "s"} left`;
+  }
+  const hours = Math.max(1, Math.ceil(ms / (3600 * 1000)));
+  return `${hours} hour${hours === 1 ? "" : "s"} left`;
+}
+
+function showBin() {
+  currentTrip = null;
+  document.title = "Bin — Fishing Logbooks";
+  const binned = Storage.listBin();
+
+  $app.innerHTML = `
+    <header class="topbar">
+      <button class="btn ghost back" id="btnBack">‹ Home</button>
+      <div class="brand">Bin<small>Deleted trips are kept for 7 days</small></div>
+      <div class="spacer"></div>
+    </header>
+    <main class="home">
+      <div class="section-label">In the bin</div>
+      <div class="trip-list" id="binList"></div>
+    </main>
+  `;
+  document.getElementById("btnBack").addEventListener("click", showHome);
+
+  const list = document.getElementById("binList");
+  if (!binned.length) {
+    list.innerHTML = `<div class="empty-note">The bin is empty.</div>`;
+    return;
+  }
+  for (const t of binned) {
+    const name = tripName(t);
+    const row = el(`
+      <div class="trip-row bin-row">
+        <span class="dot bin-dot"></span>
+        <span class="t-main">
+          <div class="t-name">${esc(name)}</div>
+          <div class="t-sub">Deleted ${fmtDate(t.deletedAt)} · <b class="t-left">${timeLeft(t.purgeAt)}</b></div>
+        </span>
+        <span class="spacer"></span>
+        <button class="btn" data-restore>Restore</button>
+        <button class="btn danger" data-purge>Delete permanently</button>
+      </div>
+    `);
+    row.querySelector("[data-restore]").addEventListener("click", () => {
+      Storage.restoreTrip(t.id);
+      toast("Trip restored.");
+      showBin();
+    });
+    row.querySelector("[data-purge]").addEventListener("click", async () => {
+      const ok = await confirmModal({
+        title: "Delete permanently?",
+        message: "Are you sure? This cannot be undone.",
+        confirmLabel: "Delete permanently",
+        danger: true,
+      });
+      if (!ok) return;
+      Storage.purgeTrip(t.id);
+      toast("Permanently deleted.");
+      showBin();
+    });
+    list.appendChild(row);
   }
 }
 
@@ -139,17 +298,20 @@ function renderTrip() {
     catch: trip.pages.filter(p => p.kind === "catch").map(p => p.id),
   };
 
+  const inOverview = currentPageId === "overview";
+
   $app.innerHTML = `
     <header class="topbar">
       <button class="btn ghost back" id="btnBack">‹ Home</button>
       <div class="brand">${esc(name)}<small>Deepsea Trawl Fishing Log — Freezer</small></div>
       <div class="spacer"></div>
+      <button class="btn ${inOverview ? "primary" : ""}" id="btnOverview" title="Scroll through every page of this trip">⧉ Trip Overview</button>
       <button class="btn" id="btnExcel">Export Excel</button>
       <button class="btn primary" id="btnPdf">Save PDF</button>
     </header>
     <div class="trip-shell">
       <nav class="pagestrip" id="pagestrip"></nav>
-      <div class="sheet-scroller print-root" id="sheets"></div>
+      <div class="sheet-scroller print-root ${inOverview ? "overview" : ""}" id="sheets"></div>
     </div>
     <button class="fab" id="fab" title="Add a sheet">+</button>
   `;
@@ -192,43 +354,53 @@ function renderTrip() {
     strip.appendChild(b);
   }
 
-  // active sheet
   const sheets = document.getElementById("sheets");
-  let paper;
-  if (currentPageId === "cover") paper = renderCover(trip, autosave);
-  else if (currentPageId === "tc1") paper = renderTC1();
-  else if (currentPageId === "tc2") paper = renderTC2();
-  else {
+
+  if (inOverview) {
+    // continuous, full-size, editable scroll of the whole trip
+    renderOverview(trip, sheets);
+  } else {
+    // single active sheet
+    let paper;
+    if (currentPageId === "cover") paper = renderCover(trip, autosave);
+    else if (currentPageId === "tc1") paper = renderTC1();
+    else if (currentPageId === "tc2") paper = renderTC2();
+    else {
+      const page = trip.pages.find(p => p.id === currentPageId);
+      if (!page) { currentPageId = "cover"; return renderTrip(); }
+      paper = page.kind === "header"
+        ? renderHeaderPage(trip, page, autosave)
+        : renderCatchPage(trip, page, autosave);
+    }
+    sheets.appendChild(paper);
+
+    // Trip Info doubles as the trip's table of contents — every page reachable from here
+    if (currentPageId === "cover") sheets.appendChild(renderTripContents(trip, counts));
+
+    // live totals on catch sheets
     const page = trip.pages.find(p => p.id === currentPageId);
-    if (!page) { currentPageId = "cover"; return renderTrip(); }
-    paper = page.kind === "header"
-      ? renderHeaderPage(trip, page, autosave)
-      : renderCatchPage(trip, page, autosave);
-  }
-  sheets.appendChild(paper);
+    if (page?.kind === "catch") refreshTotals(paper, page.data);
 
-  // Trip Info doubles as the trip's table of contents — every page reachable from here
-  if (currentPageId === "cover") sheets.appendChild(renderTripContents(trip, counts));
-
-  // live totals on catch sheets
-  const page = trip.pages.find(p => p.id === currentPageId);
-  if (page?.kind === "catch") refreshTotals(paper, page.data);
-
-  // delete page action
-  if (page) {
-    const del = el(`<div class="page-actions"><button>Remove this sheet</button></div>`);
-    del.querySelector("button").addEventListener("click", () => {
-      if (!confirm("Remove this sheet? Its data will be lost.")) return;
-      Storage.removePage(trip, page.id);
-      currentPageId = "cover";
-      renderTrip();
-    });
-    sheets.appendChild(del);
+    // delete page action
+    if (page) {
+      const del = el(`<div class="page-actions"><button>Remove this sheet</button></div>`);
+      del.querySelector("button").addEventListener("click", () => {
+        if (!confirm("Remove this sheet? Its data will be lost.")) return;
+        Storage.removePage(trip, page.id);
+        currentPageId = "cover";
+        renderTrip();
+      });
+      sheets.appendChild(del);
+    }
   }
 
   // wire chrome
   document.getElementById("btnBack").addEventListener("click", showHome);
   document.getElementById("fab").addEventListener("click", showAddSheet);
+  document.getElementById("btnOverview").addEventListener("click", () => {
+    currentPageId = inOverview ? "cover" : "overview";
+    renderTrip();
+  });
   document.getElementById("btnExcel").addEventListener("click", () => {
     const f = exportTripToExcel(trip);
     toast("Excel saved: " + f);
@@ -237,6 +409,48 @@ function renderTrip() {
 
   const activeTab = strip.querySelector(".pagetab.active");
   if (activeTab) activeTab.scrollIntoView({ inline: "center", block: "nearest" });
+
+  // if we just added a page while in overview, scroll it into view
+  if (inOverview && scrollToPageId) {
+    const target = sheets.querySelector(`[data-overview-page="${scrollToPageId}"]`);
+    if (target) target.scrollIntoView({ behavior: "smooth", block: "start" });
+    scrollToPageId = null;
+  }
+}
+
+/* ---------- Trip Overview: every page, full size, stacked & editable ---------- */
+
+let scrollToPageId = null;
+
+function renderOverview(trip, sheets) {
+  const add = (label, node, pageId) => {
+    const sec = el(`<div class="ov-section"${pageId ? ` data-overview-page="${pageId}"` : ""}></div>`);
+    sec.appendChild(el(`<div class="ov-label">${esc(label)}</div>`));
+    sec.appendChild(node);
+    sheets.appendChild(sec);
+  };
+
+  add("Trip Info", renderCover(trip, autosave), "cover");
+  add("Instructions", renderTC1(), "tc1");
+  add("Target Species", renderTC2(), "tc2");
+
+  const counts = {
+    header: trip.pages.filter(p => p.kind === "header").map(p => p.id),
+    catch: trip.pages.filter(p => p.kind === "catch").map(p => p.id),
+  };
+  for (const page of trip.pages) {
+    const label = pageLabel(page, 0, counts) + " · " +
+      (page.kind === "header" ? "Header Information per Activity Period" : "Estimated Catch per Day – Freezer");
+    const paper = page.kind === "header"
+      ? renderHeaderPage(trip, page, autosave)
+      : renderCatchPage(trip, page, autosave);
+    add(label, paper, page.id);
+    if (page.kind === "catch") refreshTotals(paper, page.data);
+  }
+
+  if (!trip.pages.length) {
+    sheets.appendChild(el(`<div class="ov-empty">No sheets yet — tap <b>+</b> to add a Header or Catch sheet. It will appear here in order.</div>`));
+  }
 }
 
 /* ---------- Trip contents (shown under Trip Info) ---------- */
@@ -310,7 +524,9 @@ function showAddSheet() {
     ch.addEventListener("click", () => {
       const pg = Storage.addPage(currentTrip, ch.dataset.kind);
       back.remove();
-      currentPageId = pg.id;
+      // in Overview, keep scrolling context and jump to the new page; otherwise open it
+      if (currentPageId === "overview") scrollToPageId = pg.id;
+      else currentPageId = pg.id;
       renderTrip();
     });
   });
